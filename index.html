@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enter the Room</title>
+</head>
+<body>
+  <h1>Room Entry</h1>
+  <input type="text" id="name" placeholder="Your name" /><br><br>
+  <input type="password" id="password" placeholder="Room password" /><br><br>
+  <button onclick="enterRoom()">Enter Room</button>
+
+  <h2 id="response"></h2>
+  <ul id="entryList"></ul>
+
+  <script>
+    async function enterRoom() {
+      const name = document.getElementById("name").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/enter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, password }),
+      });
+
+      const data = await res.json();
+      const responseEl = document.getElementById("response");
+      const entryList = document.getElementById("entryList");
+      entryList.innerHTML = "";
+
+      if (data.status === "admin") {
+        responseEl.innerText = "Admin Access: People who entered:";
+        data.entries.forEach((entry) => {
+          const li = document.createElement("li");
+          li.innerText = `${entry.name} at ${entry.time}`;
+          entryList.appendChild(li);
+        });
+      } else {
+        responseEl.innerText = data.message;
+      }
+    }
+  </script>
+</body>
+</html>
